@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+dist/
+build/
+.env
+.venv/
+venv/
+ENV/
+env/
+
+# Chroma Vectorstore
+.chroma/
+
+# VSCode settings
+.vscode/
+
+# macOS & Windows junk
+.DS_Store
+Thumbs.db
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# SQLite or local DB files (if any)
+*.db
+
+# Render deployment metadata
+.render/
+
+# Pytest cache
+.pytest_cache/
