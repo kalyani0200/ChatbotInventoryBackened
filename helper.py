@@ -8,17 +8,17 @@ from langchain.prompts import FewShotPromptTemplate, SemanticSimilarityExampleSe
 from langchain.prompts import PromptTemplate
 from langchain.chains.sql_database.prompt import PROMPT_SUFFIX
 from langchain_together import Together
-from few_shots import few_shots  # Import few_shots directly if needed
+from few_shots import few_shots  # Make sure few_shots is a list of dicts
 
 # Load environment variables
 load_dotenv()
 
-# PostgreSQL credentials
-DB_USER = "postgres"
-DB_PASSWORD = "root"
-DB_HOST = "localhost"
-DB_NAME = "Inventory"
-DB_PORT = 5432
+# PostgreSQL credentials (override with env vars in production)
+DB_USER = os.getenv("DB_USER", "postgres")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "root")
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_NAME = os.getenv("DB_NAME", "Inventory")
+DB_PORT = os.getenv("DB_PORT", "5432")
 
 # Model and Embeddings
 LLM_MODEL = "mistralai/Mistral-7B-Instruct-v0.1"
@@ -46,7 +46,7 @@ llm = Together(
 # Embeddings
 embeddings = HuggingFaceEmbeddings(model_name=EMBEDDINGS_MODEL)
 
-# Vectorstore Setup
+# Vectorstore setup
 vector_texts = [" ".join(str(value) for value in example.values()) for example in few_shots]
 vectorstore = Chroma.from_texts(
     texts=vector_texts,
@@ -57,7 +57,7 @@ vectorstore = Chroma.from_texts(
 vectorstore.persist()
 print("✅ Chroma Vectorstore Initialized and Persisted")
 
-# Example selector
+# Semantic example selector
 example_selector = SemanticSimilarityExampleSelector(
     vectorstore=vectorstore,
     k=2
@@ -79,7 +79,7 @@ Schema relationships:
 
 Do not use aliases unless necessary. Focus on correctness and clarity."""
 
-# Few-shot prompt template
+# Few-shot prompt
 example_prompt = PromptTemplate(
     input_variables=["Question", "SQLQuery", "SQLResult", "Answer"],
     template="\nQuestion: {Question}\nSQLQuery: {SQLQuery}\nSQLResult: {SQLResult}\nAnswer: {Answer}",
@@ -93,7 +93,7 @@ few_shot_prompt = FewShotPromptTemplate(
     input_variables=["input", "table_info", "top_k"],
 )
 
-# Chain setup
+# SQL chain setup
 def get_few_shot_db_chain():
     try:
         reset_session_state()
@@ -111,13 +111,13 @@ def get_few_shot_db_chain():
         print(f"❌ Error initializing SQLDatabaseChain: {e}")
         return None
 
-# Optional session reset
+# Session reset function (can be expanded as needed)
 def reset_session_state():
     print("✅ Resetting session state...")
 
-# Query processor
+# Query processing
 def process_query(query):
-    print(f"🔍 Processing query: {query}")  # Debugging line to verify query is passed correctly
+    print(f"🔍 Processing query: {query}")
     result = "Unable to process the query."
     chain = get_few_shot_db_chain()
     if chain:
