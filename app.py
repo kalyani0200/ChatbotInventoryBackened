@@ -1,15 +1,13 @@
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
-from helper import process_query
+from helper import process_query  # Ensure this exists
 import uvicorn
 import os
 
 app = FastAPI()
 
-
 class QueryRequest(BaseModel):
     query: str
-
 
 @app.post("/query/")
 async def query_product(request: Request):
@@ -22,14 +20,14 @@ async def query_product(request: Request):
 
         if not query:
             raise HTTPException(
-                status_code=400, detail="Missing 'query' in request body.")
+                status_code=400, detail="Missing 'query' in request body."
+            )
 
         result = process_query(query)
         return {"status": "success", "result": result}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
-
 
 @app.get("/health/")
 async def health_check():
@@ -40,6 +38,6 @@ async def health_check():
 
 # Run the app when executed directly (e.g., python app.py)
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))  # Default to 8000 for local dev
-    uvicorn.run("app:app", host="0.0.0.0", port=port,
-                reload=True)  # reload=True for dev
+    # Match Express fallback port: use PORT from env or 4000
+    port = int(os.environ.get("PORT", 4000))  # Fallback to 4000 like Express
+    uvicorn.run("app:app", host="0.0.0.0", port=port, reload=True)
